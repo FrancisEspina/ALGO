@@ -68,11 +68,11 @@ public class npps {
 
     public npps(int[] burst, int[] arrival, int[] priority){
         this.jobs = new ArrayList<>();
+        addJobs(arrival, burst, priority);
         jobs = IntStream.range(0, jobs.size()).boxed()
         .sorted(Comparator.comparingInt(i -> jobs.get(i).getArrivalTime()))
         .map(i-> jobs.get(i))
         .collect(Collectors.toCollection(ArrayList::new));
-        addJobs(arrival, burst, priority);
         String res = generateGanttChart();
     }
 

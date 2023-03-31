@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 class Job {
@@ -66,6 +68,10 @@ public class npps {
 
     public npps(int[] burst, int[] arrival, int[] priority){
         this.jobs = new ArrayList<>();
+        jobs = IntStream.range(0, jobs.size()).boxed()
+        .sorted(Comparator.comparingInt(i -> jobs.get(i).getArrivalTime()))
+        .map(i-> jobs.get(i))
+        .collect(Collectors.toCollection(ArrayList::new));
         addJobs(arrival, burst, priority);
         String res = generateGanttChart();
     }
@@ -203,15 +209,18 @@ public class npps {
         return chart.toString();
     }
 
-    /*public static void main(String[] args) {
-        NPPS scheduler = new NPPS();
-        int[] arrivals = {1,2,3,4};
+    public static void main(String[] args) {
+        int[] arrivals = {1,2,2,3};
         int[] bursts = {1,2,3,4};
         int[] priorities = {4,3,2,1}; 
-        scheduler.addJobs(arrivals, bursts, priorities);
+        npps scheduler = new npps(bursts, arrivals, priorities);
         String ganttChart = scheduler.generateGanttChart();
         System.out.println(ganttChart);
         System.out.println(scheduler.isEmpty());
+        for(int num : scheduler.getProcessIDs()){
+            System.out.print(num + " ");
+        }
+        System.out.println();
         for(int num : scheduler.getWaitingTimes()){
             System.out.print(num + " ");
         }
@@ -222,5 +231,5 @@ public class npps {
         System.out.println();
         System.out.println(scheduler.getAverageWaitingTime());
         System.out.println(scheduler.getAverageTurnaroundTime());
-    }*/
+    }
 }

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 import javax.swing.JOptionPane;
 
@@ -11,6 +12,8 @@ public class Input extends javax.swing.JPanel {
     public static ArrayList<Integer> burstArray = new ArrayList<Integer>();
     public static ArrayList<Integer> arrivalArray = new ArrayList<Integer>();
     public static ArrayList<Integer> pidArray = new ArrayList<Integer>();
+    public static ArrayList<Integer> prioArray = new ArrayList<Integer>();
+    public static int quantum;
     
     private void initComponents() {
         minimize = new javax.swing.JButton();
@@ -464,8 +467,60 @@ public class Input extends javax.swing.JPanel {
         
     }
 
-    public void input_to_rr(){
-      
+    public void input_to_rr(int pid, int burst, int arrival, int time_slice){
+        pidArray.add(pid);
+        burstArray.add(burst);
+        arrivalArray.add(arrival);
+        quantum = time_slice;
+        
+        System.out.println(pidArray);
+        System.out.println(burstArray);
+        System.out.println(arrivalArray);
+        System.out.println(quantum);
+    }
+
+    public void input_to_sjf(int pid, int burst, int arrival){
+        pidArray.add(pid);
+        burstArray.add(burst);
+        arrivalArray.add(arrival);
+        
+        System.out.println(pidArray);
+        System.out.println(burstArray);
+        System.out.println(arrivalArray);
+    }
+
+    public void input_to_srtf(int pid, int burst, int arrival){
+        pidArray.add(pid);
+        burstArray.add(burst);
+        arrivalArray.add(arrival);
+        
+        System.out.println(pidArray);
+        System.out.println(burstArray);
+        System.out.println(arrivalArray);
+    }
+
+    public void input_to_npps(int pid, int burst, int arrival, int priority){
+        pidArray.add(pid);
+        burstArray.add(burst);
+        arrivalArray.add(arrival);
+        prioArray.add(priority);
+        
+        System.out.println(pidArray);
+        System.out.println(burstArray);
+        System.out.println(arrivalArray);
+        System.out.println(prioArray);
+    }
+
+    public void input_to_pps(int pid, int burst, int arrival, int priority){
+        pidArray.add(pid);
+        burstArray.add(burst);
+        arrivalArray.add(arrival);
+        prioArray.add(priority);
+        
+        System.out.println(pidArray);
+        System.out.println(burstArray);
+        System.out.println(arrivalArray);
+        System.out.println(prioArray);
     }
 
     private void input_inputActionPerformed(java.awt.event.ActionEvent evt) {                                            
@@ -480,8 +535,6 @@ public class Input extends javax.swing.JPanel {
             int prio = Integer.parseInt(input_prioIn.getText());
             int quantum = Integer.parseInt(input_quantumIn.getText());
             
-
-        
             if(algo == "fcfs"){
                 if(burst > 30 | burst < 1 | arrival > 30 | arrival < 1 | prio > 30 | prio < 1 | quantum > 10 | quantum < 1) {
                     return;
@@ -489,19 +542,19 @@ public class Input extends javax.swing.JPanel {
                 input_to_fcfs(id, burst, arrival);
             }
             else if(algo == "rr"){
-                input_to_rr();
+                input_to_rr(id, burst, arrival, quantum);
             }
             else if(algo == "prio-np"){
-                
+                input_to_npps(id, burst, arrival, prio);
             }
             else if(algo == "prio-p"){
-
+                input_to_pps(id, burst, arrival, prio);
             }
             else if(algo == "sjf-np"){
-                
+                input_to_sjf(id, burst, arrival);
             }
             else if(algo == "sjf-p"){
-
+                input_to_srtf(id, burst, arrival);
             }
            
             
@@ -570,14 +623,18 @@ public class Input extends javax.swing.JPanel {
                 for(int i = 0; i < burstArray.size(); i++){
                    
                               // "ID", "Burst Time", "Arrival Time", "Priority", "Waiting Time", "Turnaround Time", "Avg Waiting Time", "Avg Turnaround Time"
-                    int id, burst, arrival, waiting, turnaround, avg_wait, avg_turn;
+                    int id, burst, arrival, waiting, turnaround;
+                    double avg_wait, avg_turn;
                     id = fcfs.getProcessIDs()[i];
                     burst = burstArray.get(i);
                     arrival = arrivalArray.get(i);
                     waiting = (fcfs.getEndTimes()[i] - arrivalArray.get(i)) - burstArray.get(i);
                     turnaround = fcfs.getEndTimes()[i] - arrivalArray.get(i);
-                Object[] row = { "P"+ (id + 1), burst, arrival, "-", waiting, turnaround, "-", "-"};
-                model2.addRow(row);
+                    avg_wait = fcfs.getAvgWaitingTime();
+                    avg_turn = fcfs.getAvgTurnaroundTime();
+
+                    Object[] row = { "P"+ (id + 1), burst, arrival, "-", waiting, turnaround, "-", "-"};
+                    model2.addRow(row);
                 }
                 int waiting = 0;
                 int turnaround = 0;
@@ -599,6 +656,30 @@ public class Input extends javax.swing.JPanel {
 
         }
         else if(algo == "rr"){
+            int[] barray = burstArray.stream().mapToInt(Integer::intValue).toArray();
+            int[] aarray = arrivalArray.stream().mapToInt(Integer::intValue).toArray();
+            try{
+                rr rr = new rr(barray, aarray, quantum);
+                System.out.println(rr);
+                javax.swing.table.DefaultTableModel model2 = (javax.swing.table.DefaultTableModel)Results.results_table.getModel();
+                int[] bursts = rr.getBursts();
+                int[] pids = rr.getProcessIDUniques();
+                int[] arrivals = rr.getArrivals();
+                int[] waits = rr.getWaitingTimes();
+                int[] turns = rr.getTurnaroundTimes();
+            
+                for(int i = 0; i < pids.length; i++){
+                    Object[] row = { "P"+ (pids[i] + 1), bursts[i], arrivals[i], "-", waits[i], turns[i], "-", "-"};
+                    model2.addRow(row);
+                }
+
+                double avgWait = rr.getAverageWaitingTime();
+                double avgTurn = rr.getAverageTurnaroundTime();
+                Object[] row2 = { "", "", "", "", "", "", avgWait, avgTurn};
+                model2.addRow(row2);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             
         }
         else if(algo == "prio-np"){
@@ -608,10 +689,56 @@ public class Input extends javax.swing.JPanel {
 
         }
         else if(algo == "sjf-np"){
+            int[] barray = burstArray.stream().mapToInt(Integer::intValue).toArray();
+            int[] aarray = arrivalArray.stream().mapToInt(Integer::intValue).toArray();
+            try{
+                sjf sjf = new sjf(barray, aarray, barray.length);
+                System.out.println(sjf);
+                javax.swing.table.DefaultTableModel model2 = (javax.swing.table.DefaultTableModel)Results.results_table.getModel();
+                int[] bursts = sjf.getBurstTime();
+                int[] pids = sjf.getProcessIds();
+                int[] arrivals = sjf.getArrivalTime();
+                int[] waits = sjf.getWaitingTimes();
+                int[] turns = sjf.getTurnaroundTimes();
             
+                for(int i = 0; i < pids.length; i++){
+                    Object[] row = { "P"+ (pids[i] + 1), bursts[i], arrivals[i], "-", waits[i], turns[i], "-", "-"};
+                    model2.addRow(row);
+                }
+
+                double avgWait = sjf.getAverageWaitingTime();
+                double avgTurn = sjf.getAverageTurnaroundTime();
+                Object[] row2 = { "", "", "", "", "", "", avgWait, avgTurn};
+                model2.addRow(row2);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         else if(algo == "sjf-p"){
+            int[] barray = burstArray.stream().mapToInt(Integer::intValue).toArray();
+            int[] aarray = arrivalArray.stream().mapToInt(Integer::intValue).toArray();
+            try{
+                srtf srtf = new srtf(barray, aarray, barray.length);
+                System.out.println(srtf);
+                javax.swing.table.DefaultTableModel model2 = (javax.swing.table.DefaultTableModel)Results.results_table.getModel();
+                int[] bursts = srtf.getBurstTime();
+                int[] pids = srtf.getProcessIDUniques();
+                int[] arrivals = srtf.getArrivalTime();
+                int[] waits = srtf.getWaitingTimes();
+                int[] turns = srtf.getTurnaroundTimes();
+            
+                for(int i = 0; i < pids.length; i++){
+                    Object[] row = { "P"+ (pids[i] + 1), bursts[i], arrivals[i], "-", waits[i], turns[i], "-", "-"};
+                    model2.addRow(row);
+                }
 
+                double avgWait = srtf.getAverageWaitingTime();
+                double avgTurn = srtf.getAverageTurnaroundTime();
+                Object[] row2 = { "", "", "", "", "", "", avgWait, avgTurn};
+                model2.addRow(row2);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         
         ALGO.card.show(ALGO.mainPanel, "7");

@@ -28,14 +28,7 @@ public class srtf {
         this.remainingTime = new int[numProcesses];
         this.completionTimes = new int[numProcesses];
         this.startTimes = new int[numProcesses];
-        this.burstTime = IntStream.range(0,arrivalTime.length).boxed()
-        .sorted(Comparator.comparing(i->arrivalTime[i]))
-        .mapToInt(i -> burstTime[i])
-        .toArray();
-        this.arrivalTime = IntStream.range(0,arrivalTime.length).boxed()
-        .sorted(Comparator.comparing(i->arrivalTime[i]))
-        .mapToInt(i -> arrivalTime[i])
-        .toArray();
+        
         for (int i = 0; i < numProcesses; i++) {
             this.remainingTime[i] = burstTime[i];
         }
@@ -89,11 +82,16 @@ public class srtf {
         while (completedCount < numProcesses) {
             int minRemainingTime = Integer.MAX_VALUE;
             int nextProcess = -1;
+            int minArrival = Integer.MAX_VALUE;
             // choose shortest remaining time
             for (int i = 0; i < numProcesses; i++) {
-                if (arrivalTime[i] <= currentTime && completed[i] == 0 && remainingTime[i] < minRemainingTime) {
-                    minRemainingTime = remainingTime[i];
-                    nextProcess = i;
+                if (arrivalTime[i] <= currentTime && completed[i] == 0 && remainingTime[i] <= minRemainingTime) {
+                    // choose the shortest arrival time
+                    if(arrivalTime[i] < minArrival){
+                        minArrival = arrivalTime[i];
+                        minRemainingTime = remainingTime[i];
+                        nextProcess = i;
+                    }
                 }
             }
             // let time pass
@@ -107,8 +105,7 @@ public class srtf {
                 sb.append("P" + nextProcess);
                 pids.add(nextProcess);
                 remainingTime[nextProcess]--; // Decrement remaining time of current process
-                minRemainingTime--;
-                if (minRemainingTime == 0) { // If current process has completed
+                if (remainingTime[nextProcess] == 0) { // If current process has completed
                     completionTimes[nextProcess] = currentTime;
                     completed[nextProcess] = 1;
                     completedCount++;
@@ -138,6 +135,31 @@ public class srtf {
         .sorted(Comparator.comparing(i->arrivalTime[i]))
         .mapToInt(i -> processIDUniques[i])
         .toArray();
+        this.startTimes = IntStream.range(0,arrivalTime.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> startTimes[i])
+        .toArray();
+        this.completionTimes = IntStream.range(0,arrivalTime.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> completionTimes[i])
+        .toArray();
+        this.waitingTimes = IntStream.range(0,arrivalTime.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> waitingTimes[i])
+        .toArray();
+        this.turnaroundTimes = IntStream.range(0,arrivalTime.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> turnaroundTimes[i])
+        .toArray();
+        this.burstTime = IntStream.range(0,arrivalTime.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> burstTime[i])
+        .toArray();
+        this.arrivalTime = IntStream.range(0,arrivalTime.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> arrivalTime[i])
+        .toArray();
+
         averageWaitingTime = IntStream.range(0,waitingTimes.length).boxed()
             .mapToInt(i -> waitingTimes[i]).average().orElse(0.0);
         averageTurnaroundTime = IntStream.range(0,turnaroundTimes.length).boxed()

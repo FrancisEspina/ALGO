@@ -161,7 +161,8 @@ public class npps {
         for(int i = 0; i < nums.length; i++){
             sum += nums[i];
         }
-        return (sum / jobs.size());
+        double result = sum / jobs.size();
+        return result;
     }
 
     public double getAverageTurnaroundTime(){
@@ -170,7 +171,8 @@ public class npps {
         for(int i = 0; i < nums.length; i++){
             sum += nums[i];
         }
-        return (sum / jobs.size());
+        double result = sum / jobs.size();
+        return result;
     }
 
 

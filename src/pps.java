@@ -96,7 +96,6 @@ public class pps {
         completionTimes = highPrioProcesses.stream().mapToInt(i-> completionTimes[i]).toArray();
         startTimes = highPrioProcesses.stream().mapToInt(i-> startTimes[i]).toArray();
 
-        
     }
 
     public int[] getProcessIds() {

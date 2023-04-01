@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -70,6 +71,9 @@ public class pps {
         }
         averageWaitingTime /= processIDs.length;
         averageTurnaroundTime /= processIDs.length;
+        processIDUniques = IntStream.range(0, processIDs.length).boxed()
+        .sorted(Comparator.comparingInt(i -> arrivalTimes[i]))
+        .mapToInt(i-> processIDs[i]).toArray();
         processIDs = highPrioProcesses.stream().mapToInt(Integer::intValue).toArray();
         waitingTimes = highPrioProcesses.stream().mapToInt(i-> waitingTimes[i]).toArray();
         turnaroundTimes = highPrioProcesses.stream().mapToInt(i-> turnaroundTimes[i]).toArray();

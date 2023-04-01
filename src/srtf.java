@@ -34,11 +34,11 @@ public class srtf {
         calculate();
     }
     
-    public int[] getArrivalTime() {
+    public int[] getArrivalTimes() {
         return arrivalTime;
     }
     
-    public int[] getBurstTime() {
+    public int[] getBurstTimes() {
         return burstTime;
     }
     
@@ -73,6 +73,7 @@ public class srtf {
     }
     public String getGanttChart() {
         ArrayList<Integer> pids = new ArrayList<>();
+        ArrayList<Integer> pidsUnique = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         int currentTime = 0;
         int[] completed = new int[numProcesses];
@@ -80,28 +81,35 @@ public class srtf {
         while (completedCount < numProcesses) {
             int minRemainingTime = Integer.MAX_VALUE;
             int nextProcess = -1;
+            // choose shortest remaining time
             for (int i = 0; i < numProcesses; i++) {
                 if (arrivalTime[i] <= currentTime && completed[i] == 0 && remainingTime[i] < minRemainingTime) {
                     minRemainingTime = remainingTime[i];
                     nextProcess = i;
                 }
             }
+            // let time pass
+            currentTime++;
+            // if no process is present, be idle
             if (nextProcess == -1) {
                 sb.append("-");
-                currentTime++;
+                
             } else {
+                // run shortest remaining time for one time unit
                 sb.append("P" + nextProcess);
                 pids.add(nextProcess);
                 remainingTime[nextProcess]--; // Decrement remaining time of current process
-                if (remainingTime[nextProcess] == 0) { // If current process has completed
-                    currentTime++;
+                minRemainingTime--;
+                if (minRemainingTime == 0) { // If current process has completed
                     completionTimes[nextProcess] = currentTime;
                     completed[nextProcess] = 1;
                     completedCount++;
+                    pidsUnique.add(nextProcess);
                 }
             }
         }
         processIDs = pids.stream().mapToInt(Integer::intValue).toArray();
+        processIDUniques = pidsUnique.stream().mapToInt(Integer::intValue).toArray();
         return sb.toString();
     }
     
@@ -122,13 +130,54 @@ public class srtf {
             .mapToInt(i -> turnaroundTimes[i]).average().orElse(0.0); 
     }
 
-    /*public static void main(String[] args){
+    public static void main(String[] args){
         int[] bursts = {1,4,2};
         int[] arrivals = {1,3,3};
-        SRTF test_srtf = new SRTF(bursts, arrivals, bursts.length);
+        srtf test_srtf = new srtf(arrivals, bursts, bursts.length);
 
-        test_srtf.calculate();
-        System.out.println(test_srtf.getGanttChart());
-    }*/
+        //System.out.println(test_srtf.getGanttChart());
+        int[] arrs = test_srtf.getProcessIDs();
+        System.out.println("\nGantt Process IDs");
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nProcesses");
+        arrs = test_srtf.getProcessIDUniques();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nArrivals");
+        arrs = test_srtf.getArrivalTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nBurst Times");
+        arrs = test_srtf.getBurstTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nStart Times");
+        arrs = test_srtf.getStartTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nCompletion Times");
+        arrs = test_srtf.getCompletionTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nWaiting Times");
+        arrs = test_srtf.getWaitingTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nTurnaround Times");
+        arrs = test_srtf.getTurnaroundTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nAverage Waiting Time: "+test_srtf.getAverageWaitingTime());
+        System.out.println("Average Turnaround Time: "+test_srtf.getAverageTurnaroundTime());
+    }
 }
 

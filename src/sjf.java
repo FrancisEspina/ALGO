@@ -151,7 +151,7 @@ public class sjf {
         .toArray();
         arrivalTime = IntStream.range(0,completionTimes.length).boxed()
         .sorted(Comparator.comparing(i->arrivalTime[i]))
-        .mapToInt(i -> completionTimes[i])
+        .mapToInt(i -> arrivalTime[i])
         .toArray(); 
 
         averageWaitingTime = IntStream.range(0,waitingTimes.length).boxed()

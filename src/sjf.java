@@ -178,8 +178,8 @@ public class sjf {
     }
 
     public static void main(String[] args){
-        int[] bursts = {1,4,2,3};
-        int[] arrivals = {1,3,2,4};
+        int[] bursts = {2,3,1,2,4};
+        int[] arrivals = {1,3,2,4,5};
         sjf test_sjf = new sjf(arrivals, bursts, bursts.length);
         //System.out.println(test_sjf.getGanttChart());
         System.out.println("Processes");

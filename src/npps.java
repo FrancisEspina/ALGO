@@ -68,11 +68,9 @@ public class npps {
 
     public npps(int[] burst, int[] arrival, int[] priority){
         this.jobs = new ArrayList<>();
+        
         addJobs(arrival, burst, priority);
-        jobs = IntStream.range(0, jobs.size()).boxed()
-        .sorted(Comparator.comparingInt(i -> jobs.get(i).getArrivalTime()))
-        .map(i-> jobs.get(i))
-        .collect(Collectors.toCollection(ArrayList::new));
+        
         String res = generateGanttChart();
     }
 
@@ -206,18 +204,30 @@ public class npps {
             }
         }
         jobs = jobsSaved;
+        jobs = IntStream.range(0, jobs.size()).boxed()
+        .sorted(Comparator.comparingInt(i -> jobs.get(i).getArrivalTime()))
+        .map(i-> jobs.get(i))
+        .collect(Collectors.toCollection(ArrayList::new));
         return chart.toString();
     }
 
     public static void main(String[] args) {
-        int[] arrivals = {1,2,2,3};
-        int[] bursts = {1,2,3,4};
-        int[] priorities = {4,3,2,1}; 
+        int[] arrivals = {1,3,2,4,5};
+        int[] bursts = {2,3,1,2,4};
+        int[] priorities = {1,2,3,4,5}; 
         npps scheduler = new npps(bursts, arrivals, priorities);
         String ganttChart = scheduler.generateGanttChart();
         System.out.println(ganttChart);
         System.out.println(scheduler.isEmpty());
         for(int num : scheduler.getProcessIDs()){
+            System.out.print(num + " ");
+        }
+        System.out.println();
+        for(int num : scheduler.getStartTimes()){
+            System.out.print(num + " ");
+        }
+        System.out.println();
+        for(int num : scheduler.getEndTimes()){
             System.out.print(num + " ");
         }
         System.out.println();

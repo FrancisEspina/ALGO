@@ -77,6 +77,7 @@ public class pps {
         burstTimes = highPrioProcesses.stream().mapToInt(i-> burstTimes[i]).toArray();
         completionTimes = highPrioProcesses.stream().mapToInt(i-> completionTimes[i]).toArray();
         startTimes = highPrioProcesses.stream().mapToInt(i-> startTimes[i]).toArray();
+        arrivalTimes = highPrioProcesses.stream().mapToInt(i-> arrivalTimes[i]).toArray();
     }
 
     public int[] getProcessIds() {
@@ -158,7 +159,7 @@ public class pps {
         sb.append("\n");
         return sb.toString();
     }
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         int[] arrivals = {1,2,3};
         int[] bursts = {2,2,2};
         int[] priorities = {3,2,1};
@@ -177,6 +178,6 @@ public class pps {
         System.out.println();
         System.out.println(scheduler.getAverageWaitingTime());
         System.out.println(scheduler.getAverageTurnaroundTime());
-    }
+    }*/
 }
     

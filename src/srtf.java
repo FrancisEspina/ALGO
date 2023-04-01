@@ -1,6 +1,7 @@
 
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.stream.IntStream;
 
 public class srtf {
@@ -27,6 +28,14 @@ public class srtf {
         this.remainingTime = new int[numProcesses];
         this.completionTimes = new int[numProcesses];
         this.startTimes = new int[numProcesses];
+        this.burstTime = IntStream.range(0,arrivalTime.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> burstTime[i])
+        .toArray();
+        this.arrivalTime = IntStream.range(0,arrivalTime.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> arrivalTime[i])
+        .toArray();
         for (int i = 0; i < numProcesses; i++) {
             this.remainingTime[i] = burstTime[i];
         }
@@ -73,7 +82,6 @@ public class srtf {
     }
     public String getGanttChart() {
         ArrayList<Integer> pids = new ArrayList<>();
-        ArrayList<Integer> pidsUnique = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         int currentTime = 0;
         int[] completed = new int[numProcesses];
@@ -104,12 +112,14 @@ public class srtf {
                     completionTimes[nextProcess] = currentTime;
                     completed[nextProcess] = 1;
                     completedCount++;
-                    pidsUnique.add(nextProcess);
                 }
             }
         }
         processIDs = pids.stream().mapToInt(Integer::intValue).toArray();
-        processIDUniques = pidsUnique.stream().mapToInt(Integer::intValue).toArray();
+        processIDUniques = IntStream.range(0,arrivalTime.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(Integer::intValue)
+        .toArray();
         return sb.toString();
     }
     
@@ -124,6 +134,10 @@ public class srtf {
         }
         this.turnaroundTimes = turnaroundTime;
         this.waitingTimes = waitingTime;
+        this.processIDUniques = IntStream.range(0,completionTimes.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> processIDUniques[i])
+        .toArray();
         averageWaitingTime = IntStream.range(0,waitingTimes.length).boxed()
             .mapToInt(i -> waitingTimes[i]).average().orElse(0.0);
         averageTurnaroundTime = IntStream.range(0,turnaroundTimes.length).boxed()
@@ -131,8 +145,8 @@ public class srtf {
     }
 
     public static void main(String[] args){
-        int[] bursts = {1,4,2};
-        int[] arrivals = {1,3,3};
+        int[] bursts = {2,2,2,2};
+        int[] arrivals = {1,3,2,4};
         srtf test_srtf = new srtf(arrivals, bursts, bursts.length);
 
         //System.out.println(test_srtf.getGanttChart());

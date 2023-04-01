@@ -96,7 +96,13 @@ public class sjf {
             for (int i = 0; i < numProcesses; i++) {
                 if (arrivalTime[i] <= currentTime && completed[i] == 0 && remainingTimes[i] <= minRemainingTime) {
                         // get the least arrival time
-                        if(arrivalTime[i] < minArrival){
+                        if(minRemainingTime == remainingTimes[i]){
+                            if(arrivalTime[i] < minArrival){
+                                minArrival = arrivalTime[i];
+                                minRemainingTime = remainingTimes[i];
+                                nextProcess = i;
+                            }
+                        }else{
                             minArrival = arrivalTime[i];
                             minRemainingTime = remainingTimes[i];
                             nextProcess = i;
@@ -156,11 +162,13 @@ public class sjf {
         .sorted(Comparator.comparing(i->arrivalTime[i]))
         .mapToInt(i -> turnaroundTimes[i])
         .toArray();
-        burstTime = pids.stream()
-        .mapToInt(i -> this.burstTime[i])
+        burstTime = IntStream.range(0,completionTimes.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> burstTime[i])
         .toArray();
-        arrivalTime = pids.stream()
-        .mapToInt(i -> this.arrivalTime[i])
+        arrivalTime = IntStream.range(0,completionTimes.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> arrivalTime[i])
         .toArray();
 
         averageWaitingTime = IntStream.range(0,waitingTimes.length).boxed()
@@ -170,7 +178,7 @@ public class sjf {
     }
 
     public static void main(String[] args){
-        int[] bursts = {2,2,2,2};
+        int[] bursts = {1,4,2,3};
         int[] arrivals = {1,3,2,4};
         sjf test_sjf = new sjf(arrivals, bursts, bursts.length);
         //System.out.println(test_sjf.getGanttChart());

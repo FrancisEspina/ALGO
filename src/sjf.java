@@ -114,14 +114,6 @@ public class sjf {
             .sorted(Comparator.comparing(i->arrivalTime[i]))
             .mapToInt(Integer::intValue)
             .toArray();
-        completionTimes = IntStream.range(0,completionTimes.length).boxed()
-        .sorted(Comparator.comparing(i->arrivalTime[i]))
-        .mapToInt(i -> completionTimes[i])
-        .toArray();
-        burstTime = IntStream.range(0,completionTimes.length).boxed()
-        .sorted(Comparator.comparing(i->arrivalTime[i]))
-        .mapToInt(i -> burstTime[i])
-        .toArray();
         
         int index = numProcesses;
         for (int i = 0; i < numProcesses; i++) {
@@ -133,6 +125,14 @@ public class sjf {
         this.waitingTimes = waitingTime;
         this.startTimes = startTime;
         this.processIds = pids;
+        completionTimes = IntStream.range(0,completionTimes.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> completionTimes[i])
+        .toArray();
+        burstTime = IntStream.range(0,completionTimes.length).boxed()
+        .sorted(Comparator.comparing(i->arrivalTime[i]))
+        .mapToInt(i -> burstTime[i])
+        .toArray();
         startTimes = IntStream.range(0,completionTimes.length).boxed()
         .sorted(Comparator.comparing(i->arrivalTime[i]))
         .mapToInt(i -> startTimes[i])
@@ -144,10 +144,6 @@ public class sjf {
         turnaroundTimes = IntStream.range(0,completionTimes.length).boxed()
         .sorted(Comparator.comparing(i->arrivalTime[i]))
         .mapToInt(i -> turnaroundTimes[i])
-        .toArray();
-        completionTimes = IntStream.range(0,completionTimes.length).boxed()
-        .sorted(Comparator.comparing(i->arrivalTime[i]))
-        .mapToInt(i -> completionTimes[i])
         .toArray();
         arrivalTime = IntStream.range(0,completionTimes.length).boxed()
         .sorted(Comparator.comparing(i->arrivalTime[i]))
@@ -161,7 +157,7 @@ public class sjf {
     }
 
     public static void main(String[] args){
-        int[] bursts = {2,2,2,2};
+        int[] bursts = {1,2,3,4};
         int[] arrivals = {1,3,2,4};
         sjf test_sjf = new sjf(arrivals, bursts, bursts.length);
         //System.out.println(test_sjf.getGanttChart());

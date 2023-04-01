@@ -70,7 +70,13 @@ public class pps {
         }
         averageWaitingTime /= processIDs.length;
         averageTurnaroundTime /= processIDs.length;
-        processIDs = highPrioProcesses.stream().mapToInt(Integer::intValue).toArray(); 
+        processIDs = highPrioProcesses.stream().mapToInt(Integer::intValue).toArray();
+        waitingTimes = highPrioProcesses.stream().mapToInt(i-> waitingTimes[i]).toArray();
+        turnaroundTimes = highPrioProcesses.stream().mapToInt(i-> turnaroundTimes[i]).toArray();
+        priorities = highPrioProcesses.stream().mapToInt(i-> priorities[i]).toArray(); 
+        burstTimes = highPrioProcesses.stream().mapToInt(i-> burstTimes[i]).toArray();
+        completionTimes = highPrioProcesses.stream().mapToInt(i-> completionTimes[i]).toArray();
+        startTimes = highPrioProcesses.stream().mapToInt(i-> startTimes[i]).toArray();
     }
 
     public int[] getProcessIds() {
@@ -109,11 +115,11 @@ public class pps {
         return turnaroundTimes;
     }
 
-    public float getAverageWaitingTime() {
+    public double getAverageWaitingTime() {
         return averageWaitingTime;
     }
 
-    public float getAverageTurnaroundTime() {
+    public double getAverageTurnaroundTime() {
         return averageTurnaroundTime;
     }
 
@@ -152,12 +158,12 @@ public class pps {
         sb.append("\n");
         return sb.toString();
     }
-    /*public static void main(String[] args) {
-        int[] arrivals = {1,2,3,4};
-        int[] bursts = {1,2,3,4};
-        int[] priorities = {4,3,2,1};
+    public static void main(String[] args) {
+        int[] arrivals = {1,2,3};
+        int[] bursts = {2,2,2};
+        int[] priorities = {3,2,1};
         int[] pids = IntStream.range(0,arrivals.length).toArray();
-        PPS scheduler = new PPS(pids,arrivals,bursts,priorities);
+        pps scheduler = new pps(pids,arrivals,bursts,priorities);
 
         String ganttChart = scheduler.getGanttChart();
         System.out.println(ganttChart);
@@ -171,6 +177,6 @@ public class pps {
         System.out.println();
         System.out.println(scheduler.getAverageWaitingTime());
         System.out.println(scheduler.getAverageTurnaroundTime());
-    }*/
+    }
 }
     

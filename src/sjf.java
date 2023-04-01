@@ -1,4 +1,5 @@
 
+import java.util.ArrayList;
 import java.util.stream.IntStream;
 
 public class sjf {
@@ -13,6 +14,7 @@ public class sjf {
     private int[] startTimes;
     private double averageTurnaroundTime;
     private double averageWaitingTime;
+    ArrayList<Integer> sortedPids = new ArrayList<>();
 
     
     public sjf(int[] arrivalTime, int[] burstTime, int numProcesses) {
@@ -27,14 +29,15 @@ public class sjf {
         for (int i = 0; i < numProcesses; i++) {
             this.remainingTimes[i] = burstTime[i];
         }
+        String res = getGanttChart();
         this.calculate();
     }
     
-    public int[] getArrivalTime() {
+    public int[] getArrivalTimes() {
         return arrivalTime;
     }
     
-    public int[] getBurstTime() {
+    public int[] getBurstTimes() {
         return burstTime;
     }
     
@@ -71,23 +74,28 @@ public class sjf {
         int currentTime = 0;
         int[] completed = new int[numProcesses];
         int completedCount = 0;
+
         while (completedCount < numProcesses) {
             int minRemainingTime = Integer.MAX_VALUE;
             int nextProcess = -1;
+            // find the process with shortest burst time which arrived already
             for (int i = 0; i < numProcesses; i++) {
                 if (arrivalTime[i] <= currentTime && completed[i] == 0 && remainingTimes[i] < minRemainingTime) {
                     minRemainingTime = remainingTimes[i];
                     nextProcess = i;
                 }
             }
+            // if there is none at one time instance, system is idle
             if (nextProcess == -1) {
                 sb.append("-");
                 currentTime++;
             } else {
-                sb.append("P" + nextProcess);
-                currentTime += remainingTimes[nextProcess];
-                remainingTimes[nextProcess] = 0;
+                // run the process with shortest burst time till completion
+                sortedPids.add(nextProcess);
+                sb.append("P" + (nextProcess+1));
+                currentTime = currentTime + remainingTimes[nextProcess];
                 completionTimes[nextProcess] = currentTime;
+                remainingTimes[nextProcess] = 0;
                 completed[nextProcess] = 1;
                 completedCount++;
             }
@@ -99,27 +107,69 @@ public class sjf {
         int[] turnaroundTime = new int[numProcesses];
         int[] waitingTime = new int[numProcesses];
         int[] startTime = new int[numProcesses];
+        int[] completeTime = new int[numProcesses];
         int[] pids = new int[numProcesses];
+        pids = sortedPids.stream().mapToInt(Integer::intValue).toArray();
+        int index = numProcesses;
         for (int i = 0; i < numProcesses; i++) {
-            pids[i] = i;
-            turnaroundTime[i] = completionTimes[i] - arrivalTime[i];
-            waitingTime[i] = turnaroundTime[i] - burstTime[i];
-            startTime[i] = waitingTime[i] + arrivalTime[i];
+            turnaroundTime[index-i-1] = completionTimes[i] - arrivalTime[i];
+            waitingTime[index-i-1] = turnaroundTime[index-i-1] - burstTime[i];
+            startTimes[index-i-1] = arrivalTime[i];
+            completeTime[i] = turnaroundTime[i] + burstTime[i];
         }
         this.turnaroundTimes = turnaroundTime;
         this.waitingTimes = waitingTime;
         this.startTimes = startTime;
         this.processIds = pids;
+        this.completionTimes = completeTime;
         averageWaitingTime = IntStream.range(0,waitingTimes.length).boxed()
             .mapToInt(i -> waitingTimes[i]).average().orElse(0.0);
         averageTurnaroundTime = IntStream.range(0,turnaroundTimes.length).boxed()
             .mapToInt(i -> turnaroundTimes[i]).average().orElse(0.0); 
     }
 
-    /*public static void main(String[] args){
-        int[] bursts = {1,4,2};
-        int[] arrivals = {1,3,3};
-        SJF test_sjf = new SJF(bursts, arrivals, bursts.length);
+    public static void main(String[] args){
+        int[] bursts = {1,2,3,4};
+        int[] arrivals = {4,3,2,1};
+        sjf test_sjf = new sjf(arrivals, bursts, bursts.length);
         System.out.println(test_sjf.getGanttChart());
-    }*/
+        System.out.println("Processes");
+        
+        int[] arrs = test_sjf.getProcessIds();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nArrivals");
+        arrs = test_sjf.getArrivalTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nBurst Times");
+        arrs = test_sjf.getBurstTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nStart Times");
+        arrs = test_sjf.getStartTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nCompletion Times");
+        arrs = test_sjf.getCompletionTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nWaiting Times");
+        arrs = test_sjf.getWaitingTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nTurnaround Times");
+        arrs = test_sjf.getTurnaroundTimes();
+        for(int i = 0; i < arrs.length; i++){
+            System.out.print(arrs[i] + " ");
+        }
+        System.out.println("\nAverage Waiting Time: "+test_sjf.getAverageWaitingTime());
+        System.out.println("Average Turnaround Time: "+test_sjf.getAverageTurnaroundTime());
+    }
 }

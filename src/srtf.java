@@ -86,8 +86,14 @@ public class srtf {
             // choose shortest remaining time
             for (int i = 0; i < numProcesses; i++) {
                 if (arrivalTime[i] <= currentTime && completed[i] == 0 && remainingTime[i] <= minRemainingTime) {
-                    // choose the shortest arrival time
-                    if(arrivalTime[i] < minArrival){
+                    // get the least arrival time
+                    if(minRemainingTime == remainingTime[i]){
+                        if(arrivalTime[i] < minArrival){
+                            minArrival = arrivalTime[i];
+                            minRemainingTime = remainingTime[i];
+                            nextProcess = i;
+                        }
+                    }else{
                         minArrival = arrivalTime[i];
                         minRemainingTime = remainingTime[i];
                         nextProcess = i;

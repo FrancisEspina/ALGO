@@ -69,19 +69,34 @@ public class pps {
                 currentTime++;
             }
         }
+        // process table variables
         averageWaitingTime /= processIDs.length;
         averageTurnaroundTime /= processIDs.length;
         processIDUniques = IntStream.range(0, processIDs.length).boxed()
         .sorted(Comparator.comparingInt(i -> arrivalTimes[i]))
         .mapToInt(i-> processIDs[i]).toArray();
+        waitingTimes = IntStream.range(0, processIDs.length).boxed()
+        .sorted(Comparator.comparingInt(i -> arrivalTimes[i]))
+        .mapToInt(i-> waitingTimes[i]).toArray();
+        turnaroundTimes = IntStream.range(0, processIDs.length).boxed()
+        .sorted(Comparator.comparingInt(i -> arrivalTimes[i]))
+        .mapToInt(i-> turnaroundTimes[i]).toArray();
+        priorities = IntStream.range(0, processIDs.length).boxed()
+        .sorted(Comparator.comparingInt(i -> arrivalTimes[i]))
+        .mapToInt(i-> priorities[i]).toArray();
+        burstTimes = IntStream.range(0, processIDs.length).boxed()
+        .sorted(Comparator.comparingInt(i -> arrivalTimes[i]))
+        .mapToInt(i-> burstTimes[i]).toArray();
+        arrivalTimes = IntStream.range(0, processIDs.length).boxed()
+        .sorted(Comparator.comparingInt(i -> arrivalTimes[i]))
+        .mapToInt(i-> arrivalTimes[i]).toArray();
+
+        // gantt chart variables
         processIDs = highPrioProcesses.stream().mapToInt(Integer::intValue).toArray();
-        waitingTimes = highPrioProcesses.stream().mapToInt(i-> waitingTimes[i]).toArray();
-        turnaroundTimes = highPrioProcesses.stream().mapToInt(i-> turnaroundTimes[i]).toArray();
-        priorities = highPrioProcesses.stream().mapToInt(i-> priorities[i]).toArray(); 
-        burstTimes = highPrioProcesses.stream().mapToInt(i-> burstTimes[i]).toArray();
         completionTimes = highPrioProcesses.stream().mapToInt(i-> completionTimes[i]).toArray();
         startTimes = highPrioProcesses.stream().mapToInt(i-> startTimes[i]).toArray();
-        arrivalTimes = highPrioProcesses.stream().mapToInt(i-> arrivalTimes[i]).toArray();
+
+        
     }
 
     public int[] getProcessIds() {

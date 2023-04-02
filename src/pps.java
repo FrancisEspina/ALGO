@@ -71,7 +71,7 @@ public class pps {
                 if (remainingBurstTimes[highestPriorityProcess] == 0) {
                     completed++;
                     isCompleted[highestPriorityProcess] = true;
-                    completionTimes[highestPriorityProcess] = currentTime + 1;
+                    completionTimes[highestPriorityProcess] = currentTime;
                     turnaroundTimes[highestPriorityProcess] = completionTimes[highestPriorityProcess] - arrivalTimes[highestPriorityProcess];
                     waitingTimes[highestPriorityProcess] = turnaroundTimes[highestPriorityProcess] - burstTimes[highestPriorityProcess];
                     startTimes[highestPriorityProcess] = waitingTimes[highestPriorityProcess] + arrivalTimes[highestPriorityProcess];
@@ -229,9 +229,9 @@ public class pps {
         return sb.toString();
     }
     public static void main(String[] args) {
-        int[] arrivals = {2,3,4};
-        int[] bursts = {2,2,2};
-        int[] priorities = {3,2,1};
+        int[] arrivals = {11,12,25,32};
+        int[] bursts = {28,28,7,10};
+        int[] priorities = {1,2,3,4};
         int[] pids = IntStream.range(0,arrivals.length).toArray();
         pps scheduler = new pps(pids,arrivals,bursts,priorities);
 
@@ -246,6 +246,10 @@ public class pps {
         }
         System.out.println("\nEnd Times");
         for(int num : scheduler.getEndTimes()){
+            System.out.print(num + " ");
+        }
+        System.out.println("\nProcess IDs");
+        for(int num : scheduler.getProcessIDUniques()){
             System.out.print(num + " ");
         }
         System.out.println("\n--------");

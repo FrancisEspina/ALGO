@@ -222,8 +222,8 @@ public class srtf {
     }
 
     public static void main(String[] args){
-        int[] bursts = {2,2,2,2};
-        int[] arrivals = {2,4,3,5};
+        int[] bursts = {29,18,7};
+        int[] arrivals = {21,9,13};
         srtf test_srtf = new srtf(arrivals, bursts, bursts.length);
 
         //System.out.println(test_srtf.getGanttChart());

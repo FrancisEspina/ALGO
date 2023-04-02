@@ -213,7 +213,7 @@ public class npps {
         return chart.toString();
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         int[] arrivals = {1,3,2,4,5};
         int[] bursts = {2,3,1,2,4};
         int[] priorities = {1,2,3,4,5}; 
@@ -243,5 +243,5 @@ public class npps {
         System.out.println();
         System.out.println(scheduler.getAverageWaitingTime());
         System.out.println(scheduler.getAverageTurnaroundTime());
-    }
+    }*/
 }

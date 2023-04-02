@@ -11,6 +11,7 @@ public class pps {
     private int[] burstTimes;
     private int[] priorities;
     private int[] startTimes;
+    private int[] endTimes;
     private int[] completionTimes;
     private int[] waitingTimes;
     private int[] turnaroundTimes;
@@ -35,12 +36,17 @@ public class pps {
 
     public void schedule() {
         int[] remainingBurstTimes = Arrays.copyOf(burstTimes, burstTimes.length);
-        ArrayList<Integer> highPrioProcesses = new ArrayList<>();
         int currentTime = 0;
         int completed = 0;
         boolean[] isCompleted = new boolean[processIDs.length];
+        
+        ArrayList<Integer> highPrioProcesses = new ArrayList<>();
+        ArrayList<Integer> firstExecs = new ArrayList<>();
+        ArrayList<Integer> lastExecs = new ArrayList<>();
+        
         while (completed != processIDs.length) {
             int highestPriorityProcess = -1;
+            int prevProcess = -1;
             int highestPriority = Integer.MAX_VALUE;
             for (int i = 0; i < processIDs.length; i++) {
                 if (arrivalTimes[i] <= currentTime && !isCompleted[i] && priorities[i] < highestPriority && remainingBurstTimes[i] > 0) {
@@ -48,10 +54,19 @@ public class pps {
                     highestPriority = priorities[i];
                 }
             }
-            
-            if (highestPriorityProcess == -1) {
-                currentTime++;
-            } else {
+            // save the first changes of a process
+            if(prevProcess != highestPriorityProcess){
+                firstExecs.add(currentTime);
+                // if some time passed already, only then add
+                if(currentTime > 0){
+                    lastExecs.add(currentTime+1);
+                }
+                prevProcess = highestPriorityProcess;
+            }
+            // let time pass
+            currentTime++;
+
+            if (highestPriorityProcess > -1) {
                 remainingBurstTimes[highestPriorityProcess]--;
                 if (remainingBurstTimes[highestPriorityProcess] == 0) {
                     completed++;
@@ -66,7 +81,6 @@ public class pps {
                 ganttChart.add(String.format("| P%d ", processIDs[highestPriorityProcess]));
                 // add the new high prio process
                 highPrioProcesses.add(highestPriorityProcess);
-                currentTime++;
             }
         }
         // process table variables
@@ -93,8 +107,41 @@ public class pps {
 
         // gantt chart variables
         processIDs = highPrioProcesses.stream().mapToInt(Integer::intValue).toArray();
+        startTimes = firstExecs.stream().mapToInt(Integer::intValue).toArray();
+        endTimes = lastExecs.stream().mapToInt(Integer::intValue).toArray();
+
+        ArrayList<Integer> pids = new ArrayList<>();
+        firstExecs = new ArrayList<>();
+        lastExecs = new ArrayList<>();
+
+        // compaction of continuous process ids, start times, and end times
+        int prevProcess = -1;
+        int nextProcess = -1;
+        for(int i = 0; i < startTimes.length; i++){
+            nextProcess = processIDs[i];
+            int index = pids.size() - 1;
+            if(prevProcess == nextProcess && index > -1){
+                // dont add the recent process and start time
+                // remove the previous end time
+                lastExecs.remove(index);
+                // add the recent end time
+                lastExecs.add(endTimes[i]);
+            }else{
+                // add three of them 
+                pids.add(processIDs[i]);
+                firstExecs.add(startTimes[i]);
+                lastExecs.add(endTimes[i]);
+            }
+            prevProcess = nextProcess;
+        }
+
+        // gantt chart variables
+        processIDs = pids.stream().mapToInt(Integer::intValue).toArray();
+        startTimes = firstExecs.stream().mapToInt(Integer::intValue).toArray();
+        endTimes = lastExecs.stream().mapToInt(Integer::intValue).toArray();
+
         completionTimes = highPrioProcesses.stream().mapToInt(i-> completionTimes[i]).toArray();
-        startTimes = highPrioProcesses.stream().mapToInt(i-> startTimes[i]).toArray();
+        
 
     }
 
@@ -124,6 +171,10 @@ public class pps {
 
     public int[] getStartTimes() {
         return startTimes;
+    }
+
+    public int[] getEndTimes() {
+        return endTimes;
     }
 
     public int[] getWaitingTimes() {
@@ -177,8 +228,8 @@ public class pps {
         sb.append("\n");
         return sb.toString();
     }
-    /*public static void main(String[] args) {
-        int[] arrivals = {1,2,3};
+    public static void main(String[] args) {
+        int[] arrivals = {2,3,4};
         int[] bursts = {2,2,2};
         int[] priorities = {3,2,1};
         int[] pids = IntStream.range(0,arrivals.length).toArray();
@@ -186,6 +237,19 @@ public class pps {
 
         String ganttChart = scheduler.getGanttChart();
         System.out.println(ganttChart);
+        for(int num : scheduler.getProcessIds()){
+            System.out.print(num + " ");
+        }
+        System.out.println("\nStart Times");
+        for(int num : scheduler.getStartTimes()){
+            System.out.print(num + " ");
+        }
+        System.out.println("\nEnd Times");
+        for(int num : scheduler.getEndTimes()){
+            System.out.print(num + " ");
+        }
+        System.out.println("\n--------");
+
         for(int num : scheduler.getWaitingTimes()){
             System.out.print(num + " ");
         }
@@ -196,6 +260,6 @@ public class pps {
         System.out.println();
         System.out.println(scheduler.getAverageWaitingTime());
         System.out.println(scheduler.getAverageTurnaroundTime());
-    }*/
+    }
 }
     

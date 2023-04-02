@@ -112,10 +112,10 @@ public class srtf {
             }
             // save the first changes of a process
             if(prevProcess != nextProcess){
-                firstExecs.add(currentTime-1);
+                firstExecs.add(currentTime);
                 // if some time passed already, only then add
                 if(currentTime > 0){
-                    lastExecs.add(currentTime);
+                    lastExecs.add(currentTime+1);
                 }
                 prevProcess = nextProcess;
             }
@@ -235,12 +235,12 @@ public class srtf {
         arrs = test_srtf.getStartTimes();
         System.out.println("\nGantt Start Times");
         for(int i = 0; i < arrs.length; i++){
-            System.out.print((arrs[i]+1) + " ");
+            System.out.print((arrs[i]) + " ");
         }
         arrs = test_srtf.getEndTimes();
         System.out.println("\nGantt End Times");
         for(int i = 0; i < arrs.length; i++){
-            System.out.print((arrs[i]+1) + " ");
+            System.out.print((arrs[i]) + " ");
         }
         System.out.println("\nProcesses");
         arrs = test_srtf.getProcessIDUniques();

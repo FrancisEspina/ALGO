@@ -87,6 +87,7 @@ public class sjf {
         int currentTime = 0;
         int[] completed = new int[numProcesses];
         int completedCount = 0;
+        ArrayList<Integer> firstExecs = new ArrayList<>();
 
         while (completedCount < numProcesses) {
             int minRemainingTime = Integer.MAX_VALUE;
@@ -115,6 +116,10 @@ public class sjf {
                 // let time pass
                 currentTime++;
             } else {
+                // save the first runtime of a process
+                if(remainingTimes[nextProcess] == burstTime[nextProcess]){
+                    firstExecs.add(currentTime);
+                }
                 // run the process with shortest burst time till completion
                 sortedPids.add(nextProcess);
                 sb.append("P" + nextProcess);
@@ -125,31 +130,21 @@ public class sjf {
                 completedCount++;
             }
         }
+        startTimes = firstExecs.stream().mapToInt(Integer::intValue).toArray();
         return sb.toString();
     }
     
     public void calculate() {
         int[] turnaroundTime = new int[numProcesses];
         int[] waitingTime = new int[numProcesses];
-        int[] startTime = new int[numProcesses];
-
-        //arrivalTime = pids.stream()
-        //.mapToInt(i -> this.arrivalTime[i])
-        //.toArray();
 
         for (int i = 0; i < numProcesses; i++) {
             turnaroundTime[i] = completionTimes[i] - arrivalTime[i];
             waitingTime[i] = turnaroundTime[i] - burstTime[i];
-            startTime[i] = waitingTime[i] + arrivalTime[i];
         }
         this.turnaroundTimes = turnaroundTime;
         this.waitingTimes = waitingTime;
-        this.startTimes = startTime;
         
-        startTimes = IntStream.range(0,completionTimes.length).boxed()
-        .sorted(Comparator.comparing(i->arrivalTime[i]))
-        .mapToInt(i -> startTimes[i])
-        .toArray();
         completionTimes = IntStream.range(0,completionTimes.length).boxed()
         .sorted(Comparator.comparing(i->arrivalTime[i]))
         .mapToInt(i -> completionTimes[i])

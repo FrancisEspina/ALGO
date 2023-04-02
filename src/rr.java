@@ -186,16 +186,16 @@ public class rr {
         .map(i -> "Process " + (pids[i]+1) + " S: " + starts[i] + " E: " + ends[i] + "\n")
         .reduce("",String::concat);
         final String result2 = IntStream.range(0, pidUniques.length).boxed()
-        .map(i-> "Process" + (pidUniques[i]+1) + " W: " + waits[i] + " T: " + turns[i] + " C: " + completes[i] + "\n")
+        .map(i-> "Process " + (pidUniques[i]+1) + " W: " + waits[i] + " T: " + turns[i] + " C: " + completes[i] + "\n")
         .reduce(result, String::concat);
         return result2;
     }
 
-    public static void main(String[] args){
+    /*public static void main(String[] args){
         int[] bursts = {2,3,1,2,4};
-        int[] arrivals = {1,3,2,4,5};
-        int time_slice = 1;
+        int[] arrivals = {2,4,3,5,6};
+        int time_slice = 3;
         rr test_rr = new rr(bursts, arrivals, time_slice);
         System.out.println(test_rr.toString());
-    }
+    }*/
 }
